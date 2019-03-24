@@ -32,8 +32,8 @@ if [ ! -f /config/rtorrent/rtorrent.rc ]; then
     cp -r /defaults/config/rtorrent/rtorrent.rc /config/rtorrent/rtorrent.rc
 fi
 
-chmod 775 -R /config
-chmod 775 -R /output
+chmod -R 777 /config/rutorrent
 
 chown rtorrent:rtorrent -R /output
 chown rtorrent:rtorrent -R /config/rtorrent
+chown nginx:nginx -R /config/rutorrent
