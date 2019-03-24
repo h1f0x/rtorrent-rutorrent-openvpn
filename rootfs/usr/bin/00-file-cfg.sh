@@ -33,7 +33,3 @@ if [ ! -f /config/rtorrent/rtorrent.rc ]; then
 fi
 
 chmod -R 777 /config/rutorrent
-
-chown rtorrent:rtorrent -R /output
-chown rtorrent:rtorrent -R /config/rtorrent
-chown nginx:nginx -R /config/rutorrent

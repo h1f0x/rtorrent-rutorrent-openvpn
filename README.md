@@ -105,15 +105,15 @@ You can use Sonarr with this client as well. Configure your Sonarr with the foll
 Name: rutorrent-openvpn
 Enable: Yes
 Host: <IP> or <HOSTNAME>
-Port: 8080
-Username & Password: empty
+Port: 80
+Username & Password: rtorrent : rtorrent
 
 # PGBlitz
 Name: rutorrent-openvpn
 Enable: Yes
 Host: rutorrent-openvpn
-Port: 8080
-Username & Password: empty
+Port: 80
+Username & Password: rtorrent : rtorrent
 ```
 
 ### Tagging
