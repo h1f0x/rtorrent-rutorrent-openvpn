@@ -106,6 +106,7 @@ Name: rutorrent-openvpn
 Enable: Yes
 Host: <IP> or <HOSTNAME>
 Port: 80
+URL Path: /rutorrent/plugins/httprpc/action.php
 Username & Password: rtorrent : rtorrent
 
 # PGBlitz
@@ -113,6 +114,7 @@ Name: rutorrent-openvpn
 Enable: Yes
 Host: rutorrent-openvpn
 Port: 80
+URL Path: /rutorrent/plugins/httprpc/action.php
 Username & Password: rtorrent : rtorrent
 ```
 
