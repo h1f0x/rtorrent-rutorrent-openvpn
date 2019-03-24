@@ -1,0 +1,149 @@
+#!/bin/bash
+# chkconfig: 2345 85 15
+# description: Start autodl-irssi and rtorrent
+### BEGIN INIT INFO
+# Provides:          autodl_rtorrent
+# Required-Start:    $local_fs $network $syslog
+# Required-Stop:     $local_fs $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Start autodl-irssi and rtorrent
+# Description:       Start autodl-irssi and rtorrent
+### END INIT INFO
+
+NAME=autodl_rtorrent
+USER=rtorrent
+SESSIONNAME=autodl
+
+resetPath() {
+	PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$PATH"
+}
+resetPath
+
+# Make sure the path is correct, and make sure we're in the home dir.
+USER_INIT="umask 022; cd; PATH=\$PATH:$PATH"
+
+# Run user command, ignoring any messages sent to stdout (eg. 'No mail.')
+runUserCmd() {
+	su - $USER -c "$USER_INIT; $1" >/dev/null && return 0
+	return 1
+}
+
+isStarted() {
+	su - $USER -c "$USER_INIT; screen -ls | grep -qE \"[ 	][0-9]+\\.$SESSIONNAME[ 	]\"" >/dev/null && return 0
+	return 1
+}
+
+startIt() {
+	isStarted && return 0
+
+	local START_IRSSI=n
+	local START_RTORRENT=n
+	which irssi > /dev/null 2>&1 && START_IRSSI=y
+	which rtorrent > /dev/null 2>&1 && START_RTORRENT=y
+
+	case $START_IRSSI$START_RTORRENT in
+		yy)
+			runUserCmd "rm -rf /config/rtorrent/session/rtorrent.lock;screen -S $SESSIONNAME -d -t rtorrent -m rtorrent -n -o import=/config/rtorrent/rtorrent.rc"
+			runUserCmd "screen -d -r $SESSIONNAME -X screen -t irssi irssi"
+			;;
+		yn)
+			runUserCmd "screen -S $SESSIONNAME -d -t irssi -m irssi"
+			;;
+		ny)
+			runUserCmd "screen -S $SESSIONNAME -d -t rtorrent -m rtorrent"
+			;;
+		nn)
+			;;
+	esac
+	return 0
+}
+
+stopIt() {
+	isStarted || return 0
+
+	runUserCmd "screen -d -r $SESSIONNAME -p irssi -X stuff \"/quit
+/quit
+\""
+	runUserCmd "screen -d -r $SESSIONNAME -p rtorrent -X xon"
+
+	for i in 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4; do
+		isStarted || break
+		sleep 1
+	done
+
+	# If it's still not stopped, kill the whole screen session
+	if isStarted; then
+		echo -n "Couldn't stop it. Killing screen session..."
+		runUserCmd "screen -d -r $SESSIONNAME -p rtorrent -X xon"
+		sleep 2
+		runUserCmd "screen -d -r $SESSIONNAME -X quit"
+		echo "Done."
+	fi
+
+	return 0
+}
+
+v_restartIt() {
+	v_stopIt
+	v_startIt
+}
+
+v_showStatus() {
+	if isStarted; then
+		echo "$NAME is running."
+	else
+		echo "$NAME is stopped."
+	fi
+}
+
+. /etc/rc.d/init.d/functions
+
+v_startIt() {
+	echo -n "Starting $NAME: "
+	startIt && success || failure
+	echo
+}
+
+v_stopIt() {
+	echo -n "Stopping $NAME: "
+	stopIt && success || failure
+	echo
+}
+
+resetPath	# Some include files may have reset it
+LOCKFILE=/var/lock/subsys/autodl_rtorrent
+updateLock() {
+	[ -z "$LOCKFILE" ] && return
+	if isStarted; then
+		touch $LOCKFILE
+	else
+		rm -f $LOCKFILE
+	fi
+}
+
+RETVAL=0
+case $1 in
+	start)
+		v_startIt
+		;;
+	stop)
+		v_stopIt
+		;;
+	force-reload|restart)
+		v_restartIt
+		;;
+	try-restart)
+		isStarted && v_restartIt
+		;;
+	status)
+		v_showStatus
+		;;
+	*)
+		echo "Usage: $0 {start|stop|restart|try-restart|force-reload|status}"
+		RETVAL=1
+		;;
+esac
+
+updateLock
+exit $RETVAL
