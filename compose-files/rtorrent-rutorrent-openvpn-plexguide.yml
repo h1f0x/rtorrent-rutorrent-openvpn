@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Title:      rTorrent + FloodUI integrated OpenVPN
+# Title:      rTorrent + ruTorrent integrated OpenVPN
 # Author(s):  h1f0x
 # URL:        https://github.com/h1f0x/rtorrent-flood-openvpn
 # GNU:        General Public License v3.0
@@ -15,8 +15,8 @@
       set_fact:
         pgrole: 'rutorrent-openvpn'
         intport: '80'
-        extport: '5896'
-        image: 'h1f0x/rutorrent-openvpn'
+        extport: '5897'
+        image: 'h1f0x/rtorrent-rutorrent-openvpn'
 
     # CORE (MANDATORY) ############################################################
     - name: 'Including cron job'
