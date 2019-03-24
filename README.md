@@ -91,7 +91,7 @@ sudo docker run -it --privileged --name rtorrent-rutorrent-openvpn -v /path/to/c
 > If not done already, deploy or modify the OpenVPN client.conf at /path/to/config/vpn
 
 ```
-docker restart rtorrent-flood-openvpn
+docker restart rtorrent-rutorrent-openvpn
 ```
 
 ### Verify OpenVPN status
